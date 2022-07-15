@@ -42,9 +42,15 @@ variable "description" {
 }
 
 variable "domain_name" {
-  description = "Domain name to access api."
+  description = "Primary domain name to access the api."
   type        = string
   default     = null
+}
+
+variable "domain_names_alternate" {
+  description = "Alternate domain names to access the api. `domain_name` is the domain for which the Route53 record will be added; not these. These alternate names are for subject alternative names in the given certificate."
+  type        = list(string)
+  default     = []
 }
 
 variable "endpoint_type" {

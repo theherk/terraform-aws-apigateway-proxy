@@ -122,7 +122,8 @@ No modules.
 | <a name="input_binary_media_types"></a> [binary\_media\_types](#input\_binary\_media\_types) | List of binary media types supported by the REST API. | `list(string)` | `[]` | no |
 | <a name="input_certificate_arn"></a> [certificate\_arn](#input\_certificate\_arn) | Certificate arn for api domain. | `string` | `null` | no |
 | <a name="input_description"></a> [description](#input\_description) | API description. | `string` | `"API Gateway for proxying requests."` | no |
-| <a name="input_domain_name"></a> [domain\_name](#input\_domain\_name) | Domain name to access api. | `string` | `null` | no |
+| <a name="input_domain_name"></a> [domain\_name](#input\_domain\_name) | Primary domain name to access the api. | `string` | `null` | no |
+| <a name="input_domain_names_alternate"></a> [domain\_names\_alternate](#input\_domain\_names\_alternate) | Alternate domain names to access the api. `domain_name` is the domain for which the Route53 record will be added; not these. These alternate names are for subject alternative names in the given certificate. | `list(string)` | `[]` | no |
 | <a name="input_endpoint_type"></a> [endpoint\_type](#input\_endpoint\_type) | API endpoint type. | `string` | `"REGIONAL"` | no |
 | <a name="input_ip_whitelist"></a> [ip\_whitelist](#input\_ip\_whitelist) | List of IP addresses that can reach the api. | `list(string)` | `[]` | no |
 | <a name="input_log_retention_days"></a> [log\_retention\_days](#input\_log\_retention\_days) | Number of days logs will be kept in CloudWatch. | `number` | `365` | no |
