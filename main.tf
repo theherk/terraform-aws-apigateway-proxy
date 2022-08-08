@@ -77,10 +77,15 @@ data "aws_iam_policy_document" "this" {
   }
 }
 
-resource "aws_cloudwatch_log_group" "this" {
+resource "aws_cloudwatch_log_group" "access" {
   # checkov:skip=CKV_AWS_158: Not encrypted.
-
   name              = "/api-gw/${var.name}"
+  retention_in_days = var.log_retention_days
+}
+
+resource "aws_cloudwatch_log_group" "exec" {
+  # checkov:skip=CKV_AWS_158: Not encrypted.
+  name              = "API-Gateway-Execution-Logs_${aws_api_gateway_rest_api.this.id}/${var.stage_name}"
   retention_in_days = var.log_retention_days
 }
 
@@ -123,9 +128,14 @@ resource "aws_api_gateway_stage" "this" {
   xray_tracing_enabled = var.xray_tracing_enabled
 
   access_log_settings {
-    destination_arn = aws_cloudwatch_log_group.this.arn
+    destination_arn = aws_cloudwatch_log_group.access.arn
     format          = jsonencode(var.access_log_format)
   }
+
+  depends_on = [
+    aws_cloudwatch_log_group.access,
+    aws_cloudwatch_log_group.exec
+  ]
 }
 
 resource "aws_api_gateway_deployment" "this" {
