@@ -18,6 +18,12 @@ variable "access_log_format" {
   }
 }
 
+variable "associate_vpc_endpoints" {
+  description = "List of vpc endpoints to associate with PRIVATE type api in endpoint configuration. This would be a subset of `source_vpc_endpoints`. It is only needed if invoking the api via generated Route53 alias, rather than with `x-apigw-api-id` header. You can read more about this here: https://docs.aws.amazon.com/apigateway/latest/developerguide/apigateway-private-apis.html#associate-private-api-with-vpc-endpoint."
+  type        = list(string)
+  default     = null
+}
+
 variable "authorizer" {
   description = "Lambda authorizer."
   default     = null

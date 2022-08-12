@@ -100,7 +100,8 @@ resource "aws_api_gateway_rest_api" "this" {
   binary_media_types = var.binary_media_types
 
   endpoint_configuration {
-    types = [var.endpoint_type]
+    types            = [var.endpoint_type]
+    vpc_endpoint_ids = var.associate_vpc_endpoints
   }
 }
 
