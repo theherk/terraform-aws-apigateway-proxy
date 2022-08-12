@@ -1,5 +1,10 @@
 locals {
   use_authorizer = var.authorizer != null
+
+  # To support earlier implementations, we still allow the use of `source_vpce`,
+  # even though we should be able to whitelist multiple source vpc endpoints.
+  # Therefore, we create a list of the combination of the two properties.
+  source_vpc_endpoints = distinct(concat(compact([var.source_vpce]), var.source_vpc_endpoints))
 }
 
 data "aws_iam_policy_document" "this" {
@@ -14,7 +19,7 @@ data "aws_iam_policy_document" "this" {
   }
 
   dynamic "statement" {
-    for_each = length(var.ip_whitelist) != 0 && var.source_vpce == null ? toset([1]) : toset([])
+    for_each = length(var.ip_whitelist) != 0 && length(local.source_vpc_endpoints) == 0 ? toset([1]) : toset([])
 
     content {
       actions   = ["execute-api:Invoke"]
@@ -35,7 +40,7 @@ data "aws_iam_policy_document" "this" {
   }
 
   dynamic "statement" {
-    for_each = length(var.ip_whitelist) != 0 && var.source_vpce != null ? toset([1]) : toset([])
+    for_each = length(var.ip_whitelist) != 0 && length(local.source_vpc_endpoints) != 0 ? toset([1]) : toset([])
 
     content {
       actions   = ["execute-api:Invoke"]
@@ -56,7 +61,7 @@ data "aws_iam_policy_document" "this" {
   }
 
   dynamic "statement" {
-    for_each = var.source_vpce != null ? toset([1]) : toset([])
+    for_each = length(local.source_vpc_endpoints) != 0 ? toset([1]) : toset([])
 
     content {
       actions   = ["execute-api:Invoke"]
@@ -66,7 +71,7 @@ data "aws_iam_policy_document" "this" {
       condition {
         test     = "StringNotEquals"
         variable = "aws:SourceVpce"
-        values   = [var.source_vpce]
+        values   = local.source_vpc_endpoints
       }
 
       principals {

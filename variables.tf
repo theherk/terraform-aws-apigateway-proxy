@@ -151,8 +151,14 @@ variable "permissions_boundary" {
   default     = null
 }
 
+variable "source_vpc_endpoints" {
+  description = "Source VPC endpoints to whitelist. Required in addition to ip_whitelist for private endpoint type."
+  type        = list(string)
+  default     = []
+}
+
 variable "source_vpce" {
-  description = "Source VPC endpoint to whitelist. Required in addition to ip_whitelist for private endpoint type."
+  description = "Source VPC endpoint to whitelist. Required in addition to ip_whitelist for private endpoint type. Deprecated, but provided for compatibility. Use `source_vpc_endpoints` instead."
   type        = string
   default     = null
 }

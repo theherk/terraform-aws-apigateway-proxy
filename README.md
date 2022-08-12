@@ -52,7 +52,7 @@ module "api" {
 
 ### Private
 
-Private rest api's can be created too, by passing `PRIVATE` as the `endpoint_type`. In this case the whitelist is used in conduction with given `source_vpce` to build the resource policy.
+Private rest api's can be created too, by passing `PRIVATE` as the `endpoint_type`. In this case the whitelist is used in conduction with given `source_vpc_endpoints` to build the resource policy.
 
 ## Contributing
 
@@ -132,7 +132,8 @@ No modules.
 | <a name="input_name"></a> [name](#input\_name) | Name of the api. | `string` | n/a | yes |
 | <a name="input_permissions_boundary"></a> [permissions\_boundary](#input\_permissions\_boundary) | ARN of the boundary policy to attach to roles. | `string` | `null` | no |
 | <a name="input_resources"></a> [resources](#input\_resources) | Resources keyed by the route's depth and path, and containing: depth, parent\_key, path\_part.<br><br>This is a complex type manual configuration is not recommended. It is recommended to use [terraform-aws-apigateway-route-builder](https://github.com/theherk/terraform-aws-apigateway-route-builder/) to generate this data. Nevertheless, a description of the type's attributes are:<pre>resources = {<br>  "0|v1" = {<br>    depth      = 0<br>    parent_key = null<br>    path_part  = "v1"<br>  }<br>}</pre> | <pre>map(object({   # key by depth | path<br>    depth      = number # nested depth<br>    parent_key = string # key of containing resource<br>    path_part  = string # individual, last path component<br>  }))</pre> | n/a | yes |
-| <a name="input_source_vpce"></a> [source\_vpce](#input\_source\_vpce) | Source VPC endpoint to whitelist. Required in addition to ip\_whitelist for private endpoint type. | `string` | `null` | no |
+| <a name="input_source_vpc_endpoints"></a> [source\_vpc\_endpoints](#input\_source\_vpc\_endpoints) | Source VPC endpoints to whitelist. Required in addition to ip\_whitelist for private endpoint type. | `list(string)` | `[]` | no |
+| <a name="input_source_vpce"></a> [source\_vpce](#input\_source\_vpce) | Source VPC endpoint to whitelist. Required in addition to ip\_whitelist for private endpoint type. Deprecated, but provided for compatibility. Use `source_vpc_endpoints` instead. | `string` | `null` | no |
 | <a name="input_stage_name"></a> [stage\_name](#input\_stage\_name) | Name of the api stage to deploy. | `string` | n/a | yes |
 | <a name="input_throttling_burst_limit"></a> [throttling\_burst\_limit](#input\_throttling\_burst\_limit) | Specifies the throttling burst limit. Should be used in combination with throttling\_rate\_limit. | `number` | `null` | no |
 | <a name="input_throttling_rate_limit"></a> [throttling\_rate\_limit](#input\_throttling\_rate\_limit) | Specifies the throttling rate limit. Should be used in combination with throttling\_burst\_limit. | `number` | `null` | no |
