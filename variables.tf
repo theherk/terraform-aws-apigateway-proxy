@@ -29,6 +29,12 @@ variable "authorizer" {
   default     = null
 }
 
+variable "authorizer_identity_source" {
+  description = "(Optional) Source of the identity in an incoming request. Defaults to `method.request.header.Authorization`. For REQUEST type, this may be a comma-separated list of values, including headers, query string parameters and stage variables - e.g., `method.request.header.SomeHeaderName,method.request.querystring.SomeQueryStringName,stageVariables.SomeStageVariableName`"
+  type        = string
+  default     = null
+}
+
 variable "binary_media_types" {
   description = "List of binary media types supported by the REST API."
   type        = list(string)

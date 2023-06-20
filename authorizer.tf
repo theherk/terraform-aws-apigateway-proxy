@@ -47,6 +47,7 @@ resource "aws_api_gateway_authorizer" "authorizer" {
 
   name                             = var.authorizer.function_name
   authorizer_credentials           = aws_iam_role.authorizer[0].arn
+  identity_source                  = var.authorizer_identity_source
   authorizer_result_ttl_in_seconds = 0
   authorizer_uri                   = var.authorizer.invoke_arn
   rest_api_id                      = aws_api_gateway_rest_api.this.id
