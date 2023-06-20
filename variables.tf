@@ -26,6 +26,7 @@ variable "associate_vpc_endpoints" {
 
 variable "authorizer" {
   description = "Lambda authorizer."
+  type        = any
   default     = null
 }
 
