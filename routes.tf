@@ -1,7 +1,3 @@
-locals {
-  http_methods = ["DELETE", "GET", "HEAD", "OPTIONS", "PATCH", "POST", "PUT"]
-}
-
 resource "aws_api_gateway_resource" "depth_0" {
   for_each = { for k, r in var.resources : k => r if r.depth == 0 }
 
