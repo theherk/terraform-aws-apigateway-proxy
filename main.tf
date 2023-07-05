@@ -164,7 +164,10 @@ resource "aws_api_gateway_deployment" "this" {
     create_before_destroy = true
   }
 
-  depends_on = [aws_api_gateway_integration.this]
+  depends_on = [
+    aws_api_gateway_integration.this,
+    aws_api_gateway_rest_api_policy.this,
+  ]
 }
 
 resource "aws_api_gateway_domain_name" "this" {
