@@ -41,8 +41,8 @@ resource "aws_api_gateway_resource" "depth_4" {
 resource "aws_api_gateway_method" "this" {
   for_each = var.methods
 
-  authorization      = local.use_authorizer ? "CUSTOM" : "NONE"
-  authorizer_id      = local.use_authorizer ? aws_api_gateway_authorizer.authorizer[0].id : null
+  authorization      = coalesce(each.value.config.authorization, local.use_authorizer ? "CUSTOM" : "NONE")
+  authorizer_id      = local.use_authorizer && each.value.config.authorization != "NONE" ? aws_api_gateway_authorizer.authorizer[0].id : null
   http_method        = each.value.method
   rest_api_id        = aws_api_gateway_rest_api.this.id
   request_parameters = coalesce(each.value.config.method_request_parameters, { "method.request.path.proxy" = true })
