@@ -45,7 +45,7 @@ resource "aws_api_gateway_method" "this" {
   authorizer_id      = local.use_authorizer && each.value.config.authorization != "NONE" ? aws_api_gateway_authorizer.authorizer[0].id : null
   http_method        = each.value.method
   rest_api_id        = aws_api_gateway_rest_api.this.id
-  request_parameters = coalesce(each.value.config.method_request_parameters, { "method.request.path.proxy" = true })
+  request_parameters = each.value.config.method_request_parameters == {} ? null : each.value.config.method_request_parameters
 
   resource_id = (each.value.root
     ? aws_api_gateway_rest_api.this.root_resource_id
@@ -74,8 +74,8 @@ resource "aws_api_gateway_integration" "this" {
   content_handling        = each.value.config.content_handling
   credentials             = each.value.config.credentials
   http_method             = aws_api_gateway_method.this[each.key].http_method
-  integration_http_method = aws_api_gateway_method.this[each.key].http_method
-  request_parameters      = coalesce(each.value.config.integration_request_parameters, { "integration.request.path.proxy" = "method.request.path.proxy" })
+  integration_http_method = contains(["AWS", "AWS_PROXY", "HTTP", "HTTP_PROXY"], each.value.config.type) ? aws_api_gateway_method.this[each.key].http_method : null
+  request_parameters      = each.value.config.integration_request_parameters == {} ? null : each.value.config.integration_request_parameters
   request_templates       = each.value.config.request_templates
   rest_api_id             = aws_api_gateway_rest_api.this.id
   timeout_milliseconds    = each.value.config.timeout_milliseconds

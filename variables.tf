@@ -107,20 +107,21 @@ variable "methods" {
   DESC
   type = map(object({ # keyed by depth | path | verb
     config = object({ # method configuration
-      cache_key_parameters           = list(string)
-      cache_namespace                = string
-      connection_id                  = string
-      connection_type                = string
-      content_handling               = string
-      credentials                    = string
-      integration_request_parameters = map(string)
-      method_request_parameters      = map(string)
-      passthrough_behavior           = string
-      request_templates              = map(string)
-      skip_verification              = bool
-      timeout_milliseconds           = number
-      type                           = string
-      uri                            = string # uri to proxy when applicable
+      authorization                  = optional(string)
+      cache_key_parameters           = optional(list(string))
+      cache_namespace                = optional(string)
+      connection_id                  = optional(string)
+      connection_type                = optional(string)
+      content_handling               = optional(string)
+      credentials                    = optional(string)
+      integration_request_parameters = optional(map(string), { "integration.request.path.proxy" = "method.request.path.proxy" })
+      method_request_parameters      = optional(map(string), { "method.request.path.proxy" = true })
+      passthrough_behavior           = optional(string)
+      request_templates              = optional(map(string))
+      skip_verification              = optional(bool)
+      timeout_milliseconds           = optional(number)
+      type                           = optional(string)
+      uri                            = optional(string, "") # uri to proxy when applicable
     })
     depth        = number # nested depth of containing resource
     key          = string # same as object key
