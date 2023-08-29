@@ -111,3 +111,59 @@ resource "aws_api_gateway_integration" "this" {
     }
   }
 }
+
+resource "aws_api_gateway_method_response" "this" {
+  for_each = { for mr in flatten([
+    for m in var.methods : [
+      for r in m.config.responses : {
+        method   = m
+        response = r
+      }
+    ]
+  ]) : "${mr.method.key}|${mr.response.status_code}" => mr }
+
+  http_method         = aws_api_gateway_method.this[each.value.method.key].http_method
+  rest_api_id         = aws_api_gateway_rest_api.this.id
+  response_parameters = each.value.response.method_parameters
+  status_code         = each.value.response.status_code
+
+  resource_id = (each.value.method.root
+    ? aws_api_gateway_rest_api.this.root_resource_id
+    : element([
+      aws_api_gateway_resource.depth_0,
+      aws_api_gateway_resource.depth_1,
+      aws_api_gateway_resource.depth_2,
+      aws_api_gateway_resource.depth_3,
+      aws_api_gateway_resource.depth_4,
+    ], each.value.method.depth)[each.value.method.resource_key].id
+  )
+}
+
+resource "aws_api_gateway_integration_response" "this" {
+  for_each = { for mr in flatten([
+    for m in var.methods : [
+      for r in m.config.responses : {
+        method   = m
+        response = r
+      }
+    ]
+  ]) : "${mr.method.key}|${mr.response.status_code}" => mr }
+
+  rest_api_id         = aws_api_gateway_rest_api.this.id
+  http_method         = aws_api_gateway_method.this[each.value.method.key].http_method
+  response_parameters = each.value.response.integration_parameters == {} ? null : each.value.response.integration_parameters
+  status_code         = aws_api_gateway_method_response.this[each.key].status_code
+
+  resource_id = (each.value.method.root
+    ? aws_api_gateway_rest_api.this.root_resource_id
+    : element([
+      aws_api_gateway_resource.depth_0,
+      aws_api_gateway_resource.depth_1,
+      aws_api_gateway_resource.depth_2,
+      aws_api_gateway_resource.depth_3,
+      aws_api_gateway_resource.depth_4,
+    ], each.value.method.depth)[each.value.method.resource_key].id
+  )
+
+  depends_on = [aws_api_gateway_integration.this]
+}

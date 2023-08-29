@@ -122,6 +122,12 @@ variable "methods" {
       timeout_milliseconds           = optional(number)
       type                           = optional(string)
       uri                            = optional(string, "") # uri to proxy when applicable
+
+      responses = optional(list(object({
+        status_code            = string
+        integration_parameters = optional(map(string))
+        method_parameters      = optional(map(bool))
+      })), [])
     })
     depth        = number # nested depth of containing resource
     key          = string # same as object key

@@ -157,6 +157,8 @@ resource "aws_api_gateway_deployment" "this" {
       aws_api_gateway_resource.depth_4,
       aws_api_gateway_method.this,
       aws_api_gateway_integration.this,
+      aws_api_gateway_integration_response.this,
+      aws_api_gateway_method_response.this
     ]))
   }
 
@@ -165,7 +167,10 @@ resource "aws_api_gateway_deployment" "this" {
   }
 
   depends_on = [
+    aws_api_gateway_method.this,
     aws_api_gateway_integration.this,
+    aws_api_gateway_integration_response.this,
+    aws_api_gateway_method_response.this,
     aws_api_gateway_rest_api_policy.this,
   ]
 }
