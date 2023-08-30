@@ -1,5 +1,5 @@
 terraform {
-  required_version = ">= 1.0.0"
+  required_version = ">= 1.3.0"
 
   required_providers {
     aws = {
@@ -15,42 +15,83 @@ locals {
       path    = "/v1"
       methods = ["POST"]
       config = {
-        request_parameters = { "integration.request.path.proxy" = "method.request.path.proxy" }
-        request_templates  = {}
-        type               = null
-        uri                = "https://example.com/v1"
+        # # Default if not given, but must give to override with null for OPTIONS.
+        # connection_type = "VPC_LINK"
+        #
+        integration_request_parameters = { "integration.request.path.proxy" = "method.request.path.proxy" }
+        method_request_parameters      = { "method.request.path.proxy" = true }
+        request_templates              = {}
+        responses                      = []
+        type                           = null
+        uri                            = "https://example.com/v1"
       }
     },
     {
       path    = "/lambda"
       methods = ["POST"]
       config = {
-        request_parameters = { "integration.request.header.X-Authorization" = "'static'" }
-        request_templates  = { "application/xml" = "{\"body\" : $input.json('$')}" }
-        type               = "AWS_PROXY"
-        uri                = aws_lambda_function.this.invoke_arn
+        integration_request_parameters = { "integration.request.header.X-Authorization" = "'static'" }
+        method_request_parameters      = {}
+        request_templates              = { "application/xml" = "{\"body\" : $input.json('$')}" }
+        responses                      = []
+        type                           = "AWS_PROXY"
+        uri                            = aws_lambda_function.this.invoke_arn
       }
     },
     {
       path    = "/mock"
       methods = ["GET"]
       config = {
-        request_parameters = { "integration.request.header.X-Authorization" = "'static'" }
-        request_templates  = { "application/xml" = "{\"body\" : $input.json('$')}" }
-        type               = "MOCK"
-        uri                = null
+        integration_request_parameters = { "integration.request.header.X-Authorization" = "'static'" }
+        method_request_parameters      = {}
+        request_templates              = { "application/xml" = "{\"body\" : $input.json('$')}" }
+        responses                      = []
+        type                           = "MOCK"
+        uri                            = null
       }
     },
     {
-      path    = "/v1/{proxy+}"
-      methods = ["ANY"]
+      path = "/v1/{proxy+}"
+      # Here ["ANY"] could be used except we want to catch all OPTIONS below.
+      methods = ["DELETE", "GET", "HEAD", "PATCH", "POST", "PUT"]
       config = {
-        request_parameters = { "integration.request.path.proxy" = "method.request.path.proxy" }
-        request_templates  = {}
-        type               = null
-        uri                = "https://example.com/v1/{proxy}"
+        integration_request_parameters = { "integration.request.path.proxy" = "method.request.path.proxy" }
+        method_request_parameters      = { "method.request.path.proxy" = true }
+        request_templates              = {}
+        responses                      = []
+        type                           = null
+        uri                            = "https://example.com/v1/{proxy}"
       }
     },
+    {
+      path    = "/{proxy+}"
+      methods = ["OPTIONS"]
+      config = {
+        integration_request_parameters = {}
+        method_request_parameters      = {}
+        request_templates              = { "application/json" = jsonencode({ statusCode = 200 }) }
+        type                           = "MOCK"
+        uri                            = ""
+
+        responses = [{
+          status_code = 200
+
+          integration_parameters = {
+            "method.response.header.Access-Control-Allow-Headers"     = "'*'"
+            "method.response.header.Access-Control-Allow-Methods"     = "'*'"
+            "method.response.header.Access-Control-Allow-Origin"      = "'*'"
+            "method.response.header.Access-Control-Allow-Credentials" = "'true'"
+          }
+
+          method_parameters = {
+            "method.response.header.Access-Control-Allow-Headers"     = true
+            "method.response.header.Access-Control-Allow-Methods"     = true
+            "method.response.header.Access-Control-Allow-Origin"      = true
+            "method.response.header.Access-Control-Allow-Credentials" = true
+          }
+        }]
+      }
+    }
   ]
 }
 
