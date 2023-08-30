@@ -125,6 +125,7 @@ variable "methods" {
 
       responses = optional(list(object({
         status_code            = string
+        selection_pattern      = optional(string)
         integration_parameters = optional(map(string))
         method_parameters      = optional(map(bool))
       })), [])

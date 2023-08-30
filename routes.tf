@@ -151,6 +151,7 @@ resource "aws_api_gateway_integration_response" "this" {
   rest_api_id         = aws_api_gateway_rest_api.this.id
   http_method         = aws_api_gateway_method.this[each.value.method.key].http_method
   response_parameters = each.value.response.integration_parameters == {} ? null : each.value.response.integration_parameters
+  selection_pattern   = each.value.response.selection_pattern
   status_code         = aws_api_gateway_method_response.this[each.key].status_code
 
   resource_id = (each.value.method.root
