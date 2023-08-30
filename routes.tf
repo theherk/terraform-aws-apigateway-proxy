@@ -63,9 +63,8 @@ resource "aws_api_gateway_integration" "this" {
   for_each = { for m in var.methods : m.key => merge(m, {
     connection_type = try(coalesce(
       m.config.connection_type,
-      contains(["HTTP", "HTTP_PROXY"], coalesce(m.config.type, "HTTP_PROXY")) ? "VPC_LINK" : null
+      contains(["HTTP", "HTTP_PROXY"], m.config.type) ? "VPC_LINK" : null
     ), null)
-    type = coalesce(m.config.type, "HTTP_PROXY")
   }) }
 
   cache_key_parameters    = each.value.config.cache_key_parameters
@@ -79,7 +78,7 @@ resource "aws_api_gateway_integration" "this" {
   request_templates       = each.value.config.request_templates
   rest_api_id             = aws_api_gateway_rest_api.this.id
   timeout_milliseconds    = each.value.config.timeout_milliseconds
-  type                    = each.value.type
+  type                    = each.value.config.type
   uri                     = each.value.config.uri
 
   connection_id = try(coalesce(

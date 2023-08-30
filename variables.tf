@@ -120,7 +120,7 @@ variable "methods" {
       request_templates              = optional(map(string))
       skip_verification              = optional(bool)
       timeout_milliseconds           = optional(number)
-      type                           = optional(string)
+      type                           = optional(string, "HTTP_PROXY")
       uri                            = optional(string, "") # uri to proxy when applicable
 
       responses = optional(list(object({
