@@ -84,6 +84,51 @@ variable "log_retention_days" {
   default     = 365
 }
 
+variable "method_settings" {
+  description = "Settings for all API path methods. For descriptions see: https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/api_gateway_method_settings#settings"
+
+  type = object({
+    cache_data_encrypted                       = optional(bool)
+    cache_ttl_in_seconds                       = optional(number)
+    caching_enabled                            = optional(bool)
+    data_trace_enabled                         = optional(bool)
+    logging_level                              = optional(string)
+    metrics_enabled                            = optional(bool)
+    require_authorization_for_cache_control    = optional(bool)
+    throttling_burst_limit                     = optional(number)
+    throttling_rate_limit                      = optional(number)
+    unauthorized_cache_control_header_strategy = optional(string)
+  })
+
+  default = {
+    data_trace_enabled     = true
+    logging_level          = "INFO"
+    throttling_burst_limit = 3
+    throttling_rate_limit  = 2
+  }
+
+  validation {
+    condition = (
+      var.method_settings.logging_level == null ? true :
+      contains(["ERROR", "INFO", "OFF"], var.method_settings.logging_level)
+    )
+
+    error_message = "If given logging_level must be ERROR, INFO, or OFF."
+  }
+
+  validation {
+    condition = (
+      var.method_settings.unauthorized_cache_control_header_strategy == null ? true :
+      contains(
+        ["FAIL_WITH_403", "SUCCEED_WITH_RESPONSE_HEADER", "SUCCEED_WITHOUT_RESPONSE_HEADER"],
+        var.method_settings.unauthorized_cache_control_header_strategy
+      )
+    )
+
+    error_message = "If given unauthorized_cache_control_header_strategy must be FAIL_WITH_403, SUCCEED_WITH_RESPONSE_HEADER, or SUCCEED_WITHOUT_RESPONSE_HEADER."
+  }
+}
+
 variable "methods" {
   description = <<-DESC
     Methods with resource associations and integration configuration.
@@ -190,13 +235,13 @@ variable "stage_name" {
 }
 
 variable "throttling_burst_limit" {
-  description = "Specifies the throttling burst limit. Should be used in combination with throttling_rate_limit."
+  description = "(DEPRECATED) Use `method_settings` instead. This will still work until removed, but will be superseded by `methods_settings`. Specifies the throttling burst limit. Should be used in combination with throttling_rate_limit."
   type        = number
   default     = null
 }
 
 variable "throttling_rate_limit" {
-  description = "Specifies the throttling rate limit. Should be used in combination with throttling_burst_limit."
+  description = "(DEPRECATED) Use `method_settings` instead. This will still work until removed, but will be superseded by `methods_settings`. Specifies the throttling rate limit. Should be used in combination with throttling_burst_limit."
   type        = number
   default     = null
 }

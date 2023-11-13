@@ -116,10 +116,16 @@ resource "aws_api_gateway_method_settings" "s_all" {
   stage_name  = aws_api_gateway_stage.this.stage_name
 
   settings {
-    data_trace_enabled     = true
-    logging_level          = "INFO"
-    throttling_burst_limit = var.throttling_burst_limit
-    throttling_rate_limit  = var.throttling_rate_limit
+    cache_data_encrypted                       = var.method_settings.cache_data_encrypted
+    cache_ttl_in_seconds                       = var.method_settings.cache_ttl_in_seconds
+    caching_enabled                            = var.method_settings.caching_enabled
+    data_trace_enabled                         = var.method_settings.data_trace_enabled
+    logging_level                              = var.method_settings.logging_level
+    metrics_enabled                            = var.method_settings.metrics_enabled
+    require_authorization_for_cache_control    = var.method_settings.require_authorization_for_cache_control
+    throttling_burst_limit                     = try(coalesce(var.method_settings.throttling_burst_limit, var.throttling_burst_limit), null)
+    throttling_rate_limit                      = try(coalesce(var.method_settings.throttling_rate_limit, var.throttling_rate_limit), null)
+    unauthorized_cache_control_header_strategy = var.method_settings.unauthorized_cache_control_header_strategy
   }
 }
 
