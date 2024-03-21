@@ -203,7 +203,7 @@ resource "aws_api_gateway_base_path_mapping" "this" {
 }
 
 resource "aws_route53_record" "this" {
-  count = var.domain_name != null ? 1 : 0
+  count = var.domain_name != null && var.zone_id != null ? 1 : 0
 
   name    = aws_api_gateway_domain_name.this[var.domain_name].domain_name
   type    = "A"
