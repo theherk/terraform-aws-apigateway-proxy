@@ -217,7 +217,7 @@ resource "aws_route53_record" "this" {
   }
 
   dynamic "cidr_routing_policy" {
-    for_each = try([var.routing_policy.cidr], [])
+    for_each = var.routing_policy != null ? var.routing_policy.cidr != null ? [var.routing_policy.cidr] : [] : []
 
     content {
       collection_id = cidr_routing_policy.value.collection_id
@@ -226,7 +226,7 @@ resource "aws_route53_record" "this" {
   }
 
   dynamic "failover_routing_policy" {
-    for_each = try([var.routing_policy.failover], [])
+    for_each = var.routing_policy != null ? var.routing_policy.failover != null ? [var.routing_policy.failover] : [] : []
 
     content {
       type = failover_routing_policy.value.type
@@ -234,7 +234,7 @@ resource "aws_route53_record" "this" {
   }
 
   dynamic "geolocation_routing_policy" {
-    for_each = try([var.routing_policy.geolocation], [])
+    for_each = var.routing_policy != null ? var.routing_policy.geolocation != null ? [var.routing_policy.geolocation] : [] : []
 
     content {
       continent   = geolocation_routing_policy.value.continent
@@ -244,7 +244,7 @@ resource "aws_route53_record" "this" {
   }
 
   dynamic "geoproximity_routing_policy" {
-    for_each = try([var.routing_policy.geoproximity], [])
+    for_each = var.routing_policy != null ? var.routing_policy.geoproximity != null ? [var.routing_policy.geoproximity] : [] : []
 
     content {
       aws_region       = geoproximity_routing_policy.value.aws_region
@@ -263,7 +263,7 @@ resource "aws_route53_record" "this" {
   }
 
   dynamic "latency_routing_policy" {
-    for_each = try([var.routing_policy.latency], [])
+    for_each = var.routing_policy != null ? var.routing_policy.latency != null ? [var.routing_policy.latency] : [] : []
 
     content {
       region = latency_routing_policy.value.region
@@ -271,7 +271,7 @@ resource "aws_route53_record" "this" {
   }
 
   dynamic "weighted_routing_policy" {
-    for_each = try([var.routing_policy.weighted], [])
+    for_each = var.routing_policy != null ? var.routing_policy.weighted != null ? [var.routing_policy.weighted] : [] : []
 
     content {
       weight = weighted_routing_policy.value.weight
