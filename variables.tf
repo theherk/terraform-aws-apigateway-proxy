@@ -14,7 +14,6 @@ variable "access_log_format" {
     "domainName"     = "$context.domainName",
     "error.message"  = "$context.error.message",
     "contextPath"    = "$context.path",
-    "protocol"       = "$context.protocol"
   }
 }
 
@@ -215,6 +214,49 @@ variable "permissions_boundary" {
   description = "ARN of the boundary policy to attach to roles."
   type        = string
   default     = null
+}
+
+variable "routing_policy" {
+  description = "Routing policy applied to the alias A record when `domain_name` is given. This can be useful if you intend to failover to an alternate API. It is not required, and when not given, a simple routing policy will be used."
+  default     = null
+
+  type = object({
+    set_identifier = string
+
+    cidr = optional(object({
+      collection_id = string
+      location_name = string
+    }))
+
+    failover = optional(object({
+      type = string
+    }))
+
+    geolocation = optional(object({
+      continent   = string
+      country     = string
+      subdivision = optional(string)
+    }))
+
+    geoproximity = optional(object({
+      aws_region       = optional(string)
+      bias             = optional(string)
+      local_zone_group = optional(string)
+
+      coordinates = optional(object({
+        latitude  = string
+        longitude = string
+      }))
+    }))
+
+    latency = optional(object({
+      region = string
+    }))
+
+    weighted = optional(object({
+      weight = number
+    }))
+  })
 }
 
 variable "source_vpc_endpoints" {

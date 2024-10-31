@@ -205,13 +205,76 @@ resource "aws_api_gateway_base_path_mapping" "this" {
 resource "aws_route53_record" "this" {
   count = var.domain_name != null && var.zone_id != null ? 1 : 0
 
-  name    = aws_api_gateway_domain_name.this[var.domain_name].domain_name
-  type    = "A"
-  zone_id = var.zone_id
+  name           = aws_api_gateway_domain_name.this[var.domain_name].domain_name
+  set_identifier = try(var.routing_policy.set_identifier, null)
+  type           = "A"
+  zone_id        = var.zone_id
 
   alias {
     evaluate_target_health = true
     name                   = aws_api_gateway_domain_name.this[var.domain_name].regional_domain_name
     zone_id                = aws_api_gateway_domain_name.this[var.domain_name].regional_zone_id
+  }
+
+  dynamic "cidr_routing_policy" {
+    for_each = var.routing_policy.cidr != null ? [var.routing_policy.cidr] : []
+
+    content {
+      collection_id = cidr_routing_policy.value.collection_id
+      location_name = cidr_routing_policy.value.location_name
+    }
+  }
+
+  dynamic "failover_routing_policy" {
+    for_each = var.routing_policy.failover != null ? [var.routing_policy.failover] : []
+
+    content {
+      type = failover_routing_policy.value.type
+    }
+  }
+
+  dynamic "geolocation_routing_policy" {
+    for_each = var.routing_policy.geolocation != null ? [var.routing_policy.geolocation] : []
+
+    content {
+      continent   = geolocation_routing_policy.value.continent
+      country     = geolocation_routing_policy.value.country
+      subdivision = geolocation_routing_policy.value.subdivision
+    }
+  }
+
+  dynamic "geoproximity_routing_policy" {
+    for_each = var.routing_policy.geoproximity != null ? [var.routing_policy.geoproximity] : []
+
+    content {
+      aws_region       = geoproximity_routing_policy.value.aws_region
+      bias             = geoproximity_routing_policy.value.bias
+      local_zone_group = geoproximity_routing_policy.value.local_zone_group
+
+      dynamic "coordinates" {
+        for_each = geoproximity_routing_policy.value.coordinates != null ? [geoproximity_routing_policy.value.coordinates] : []
+
+        content {
+          latitude  = coordinates.value.latitude
+          longitude = coordinates.value.longitude
+        }
+      }
+    }
+  }
+
+  dynamic "latency_routing_policy" {
+    for_each = var.routing_policy.latency != null ? [var.routing_policy.latency] : []
+
+    content {
+      region = latency_routing_policy.value.region
+    }
+  }
+
+  dynamic "weighted_routing_policy" {
+    for_each = var.routing_policy.weighted != null ? [var.routing_policy.weighted] : []
+
+    content {
+      weight = weighted_routing_policy.value.weight
+    }
   }
 }
