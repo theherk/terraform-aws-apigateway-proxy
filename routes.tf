@@ -67,24 +67,37 @@ resource "aws_api_gateway_integration" "this" {
     ), null)
   }) }
 
-  cache_key_parameters    = each.value.config.cache_key_parameters
-  cache_namespace         = each.value.config.cache_namespace
-  connection_type         = each.value.connection_type
-  content_handling        = each.value.config.content_handling
-  credentials             = each.value.config.credentials
-  http_method             = aws_api_gateway_method.this[each.key].http_method
-  integration_http_method = contains(["AWS", "AWS_PROXY", "HTTP", "HTTP_PROXY"], each.value.config.type) ? aws_api_gateway_method.this[each.key].http_method : null
-  request_parameters      = each.value.config.integration_request_parameters == {} ? null : each.value.config.integration_request_parameters
-  request_templates       = each.value.config.request_templates
-  rest_api_id             = aws_api_gateway_rest_api.this.id
-  timeout_milliseconds    = each.value.config.timeout_milliseconds
-  type                    = each.value.config.type
-  uri                     = each.value.config.uri
+  cache_key_parameters = each.value.config.cache_key_parameters
+  cache_namespace      = each.value.config.cache_namespace
+  connection_type      = each.value.connection_type
+  content_handling     = each.value.config.content_handling
+  credentials          = each.value.config.credentials
+  http_method          = aws_api_gateway_method.this[each.key].http_method
+  request_parameters   = each.value.config.integration_request_parameters == {} ? null : each.value.config.integration_request_parameters
+  request_templates    = each.value.config.request_templates
+  rest_api_id          = aws_api_gateway_rest_api.this.id
+  timeout_milliseconds = each.value.config.timeout_milliseconds
+  type                 = each.value.config.type
+  uri                  = each.value.config.uri
 
   connection_id = try(coalesce(
     each.value.config.connection_id,
     each.value.connection_type == "VPC_LINK" ? var.vpc_link_id : null
   ), null)
+
+  // When the integration type is AWS_PROXY, this is a Lambda integration.
+  // In these cases, the integration method must be POST, no matter the HTTP verb.
+  // In the remaining marked cases, the integration method must be the same as the HTTP verb.
+  // All other types have no value here.
+  integration_http_method = (
+    each.value.config.type == "AWS_PROXY"
+    ? "POST"
+    : (
+      contains(["AWS", "HTTP", "HTTP_PROXY"], each.value.config.type)
+      ? aws_api_gateway_method.this[each.key].http_method
+      : null
+    )
+  )
 
   passthrough_behavior = try(coalesce(
     each.value.config.passthrough_behavior,
