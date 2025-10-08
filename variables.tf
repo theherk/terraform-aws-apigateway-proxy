@@ -5,6 +5,7 @@ variable "access_log_format" {
   default = {
     "requestId"      = "$context.requestId",
     "ip"             = "$context.identity.sourceIp",
+    "vpce"           = "$context.identity.vpceId",
     "requestTime"    = "$context.requestTime",
     "httpMethod"     = "$context.httpMethod",
     "routeKey"       = "$context.routeKey",
