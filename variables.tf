@@ -18,6 +18,12 @@ variable "access_log_format" {
   }
 }
 
+variable "access_log_format_extra" {
+  description = "This map will be merged and its values preferred to `access_log_format` if a key is in both. You can of course set the format entirely using just `access_log_format`. The purpose of this is to use the default `access_log_format`, but append additional values to it."
+  type        = map(any)
+  default     = {}
+}
+
 variable "associate_vpc_endpoints" {
   description = "List of vpc endpoints to associate with PRIVATE type api in endpoint configuration. This would be a subset of `source_vpc_endpoints`. It is only needed if invoking the api via generated Route53 alias, rather than with `x-apigw-api-id` header. You can read more about this here: https://docs.aws.amazon.com/apigateway/latest/developerguide/apigateway-private-apis.html#associate-private-api-with-vpc-endpoint."
   type        = list(string)
