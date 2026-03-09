@@ -318,3 +318,9 @@ variable "zone_id" {
   type        = string
   default     = null
 }
+
+variable "health_check_id" {
+  description = "ID of the health check to associate with the route53 record. Only applicable if `domain_name` and `zone_id` are given. This is useful if you want to use Route53 health checks to failover to an alternate API."
+  type        = string
+  default     = null
+}
