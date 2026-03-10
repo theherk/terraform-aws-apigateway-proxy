@@ -206,10 +206,11 @@ resource "aws_api_gateway_base_path_mapping" "this" {
 resource "aws_route53_record" "this" {
   count = var.domain_name != null && var.zone_id != null ? 1 : 0
 
-  name           = aws_api_gateway_domain_name.this[var.domain_name].domain_name
-  set_identifier = try(var.routing_policy.set_identifier, null)
-  type           = "A"
-  zone_id        = var.zone_id
+  health_check_id = var.health_check_id
+  name            = aws_api_gateway_domain_name.this[var.domain_name].domain_name
+  set_identifier  = try(var.routing_policy.set_identifier, null)
+  type            = "A"
+  zone_id         = var.zone_id
 
   alias {
     evaluate_target_health = true
