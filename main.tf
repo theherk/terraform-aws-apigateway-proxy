@@ -166,7 +166,8 @@ resource "aws_api_gateway_deployment" "this" {
       aws_api_gateway_integration.this,
       aws_api_gateway_integration_response.this,
       aws_api_gateway_method_response.this,
-      var.authorizer,
+      try(var.authorizer.function_name, null),
+      try(var.authorizer.invoke_arn, null),
       var.method_settings
     ]))
   }
