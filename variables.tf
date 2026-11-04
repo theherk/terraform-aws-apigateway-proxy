@@ -99,11 +99,11 @@ variable "ip_whitelist" {
 variable "log_retention_days" {
   description = "Number of days logs will be kept in CloudWatch."
   type        = number
-  default     = 365
+  default     = 30
 }
 
 variable "method_settings" {
-  description = "Settings for all API path methods. For descriptions see: https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/api_gateway_method_settings#settings"
+  description = "Settings for all API path methods. Data trace is disabled by default because it logs full request and response headers and bodies, including credentials and personal data, to CloudWatch. For descriptions see: https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/api_gateway_method_settings#settings"
 
   type = object({
     cache_data_encrypted                       = optional(bool)
@@ -119,7 +119,7 @@ variable "method_settings" {
   })
 
   default = {
-    data_trace_enabled     = true
+    data_trace_enabled     = false
     logging_level          = "INFO"
     throttling_burst_limit = 3
     throttling_rate_limit  = 2
